@@ -1,0 +1,11 @@
+Metadata-Version: 2.1
+Name: wwwgetpy
+Version: 0.1
+Summary: It is a Windows WSL wget python lib to use it for HTML folder directories in paralel
+Home-page: https://github.com/sacamar2/wwwget_py
+Author: sacamar2
+License: MIT
+Classifier: Operating System :: Windows
+Classifier: License :: OSI Approved :: MIT License
+Provides-Extra: dev
+License-File: LICENSE

@@ -1,0 +1,8 @@
+LICENSE
+README.md
+setup.py
+src/wwwgetpy.egg-info/PKG-INFO
+src/wwwgetpy.egg-info/SOURCES.txt
+src/wwwgetpy.egg-info/dependency_links.txt
+src/wwwgetpy.egg-info/requires.txt
+src/wwwgetpy.egg-info/top_level.txt
