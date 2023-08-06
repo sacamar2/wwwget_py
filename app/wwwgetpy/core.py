@@ -1,17 +1,12 @@
-
+from typing import Type
 from bs4 import BeautifulSoup as bs
 import requests as r
 from dataclasses import dataclass, field
-#from concurrent.futures import ThreadPoolExecutor
-#from threading import Thread
+from threading import Thread
 import os
 
-w='wsl wget -nv'
-DOWNLOAD_FOLDER='./'
-
-url_example="https://ree.juegocontrola.com/assets/js/keyboard/"
-
-#os.environ['WWGETPY_PATH']='assets/js/keyboard/'
+_WW_CMD='wsl wget -nv'
+DOWNLOAD_FOLDER=os.environ.get('WWWGETPY_DOWNLOAD_FOLDER','./')
 
 @dataclass
 class ElementBuilder:
@@ -53,7 +48,7 @@ class ElementBuilder:
                             self.complete_path,
                             self.complete_url).download()
         else:
-            #print(f'---FILE \n {self.name} is going to be download')
+            print(f'---FILE \n {self.name} is going to be download')
             File(self.domain,self.name,
                             self.parent_path,
                             self.complete_path,
@@ -67,22 +62,13 @@ class Folder(ElementBuilder):
     
     def run_source(self):
         print(f'A new Source was created for {self.name}')
-        Source(path=self.complete_path).run_all_elements()
+        Source(domain=self.domain,
+               path=self.complete_path).run_all_elements()
         
     def download(self):
         try:
-            # Call download for each file            
-            #File(self.domain,self.name,
-            #                self.parent_path,
-            #                self.complete_path,
-            #               self.complete_url).download()
-            
             # Run a source for this folder
-            if self.is_folder():
-                self.run_source()
-                #Thread(target=self.run_source).start()
-            else:
-                print('It is a FILE but it was created as FOLDER!!!')
+            Thread(target=self.run_source).start()
             exec_msg=f'It was possible to manage {self.name}.'
             print(exec_msg)
          
@@ -98,9 +84,8 @@ class File(ElementBuilder):
     complete_url: str # This address is needed to know the web source
     
     def download(self):
-        #complete_path=self.complete_path#.replace("/","\\")
         try:
-            os.system(f'{w} {self.complete_url} -P {DOWNLOAD_FOLDER}\{self.parent_path}')
+            os.system(f'{_WW_CMD} {self.complete_url} -P {DOWNLOAD_FOLDER}\{self.parent_path}')
             exec_msg=f'It was possible to get the file {self.name} in {self.parent_path}.'
             print(self.complete_path)
         except Exception as e:
@@ -110,11 +95,14 @@ class File(ElementBuilder):
 
 @dataclass
 class Source:
-    domain: str = 'https://ree.juegocontrola.com'
-    path: str = 'assets/'
+    domain: str = os.environ.get('WWWGETPY_DOMAIN') # The domain could not change
+    path: str = None # The path must change to be recursive, by default the class won't be init
     url: str = field(init=False)
     
     def __post_init__(self):
+        if None in (self.domain,self.path):
+            raise ValueError(f'None is not a valid value, check: \n- domain: {self.domain} \n- path: {self.path}')
+        
         self.url=f"{self.domain}/{self.path}"
     
     def get_all_elements(self):
@@ -147,16 +135,18 @@ class Source:
 
 @dataclass
 class Manager():
-    domain=os.environ.get('WWGETPY_DOMAIN','https://ree.juegocontrola.com')
-    path=os.environ.get('WWGETPY_PATH','assets/')
-
-    s = Source(domain=domain,path=path)
+    domain: str = os.environ.get('WWWGETPY_DOMAIN') # 'http://google.com'
+    path: str = os.environ.get('WWWGETPY_PATH') # 'search'
     
+    def __post_init__(self):
+        if None in (self.domain,self.path):
+            raise ValueError(f'None is not a valid value, check: \n- domain: {self.domain} \n- path: {self.path}')
+        
+        self.s = Source(domain=self.domain,path=self.path)
     
     def download_all_files(self) -> None:
         all_elem=self.s.get_all_elements()
         for e in all_elem: e.download()
-        
 
 if __name__=='__main__':
     m=Manager().download_all_files()
