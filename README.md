@@ -10,7 +10,6 @@ I came across a bunch of folders on an URL but wget kept creating strange artifa
 Probably, wget can do the same this lib does. Because of it, I wanted to go a bit further. This lib does in paralel what wget does linearly, this means faster downloads.
 
 ## Advantage/Disadvantage vs wget
-## Advantage wwwgetpy vs wget
 
 | Advantage      | Disadvantage |
 | ----------- | ----------- |
